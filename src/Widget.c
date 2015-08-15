@@ -15,7 +15,8 @@ void InitWidget(Widget* widget, Widget* parent, bool parent_destroy,
                 WidgetDestructor destructor)
 {
     if(!(widget && destructor && render_callback)) return;
-    widget->parent = parent;
+    if(parent) AddChild(parent, widget);
+    else widget->parent = NULL;
     widget->left = NULL;
     widget->right = NULL;
     widget->parent_destroy = parent_destroy;
@@ -94,6 +95,7 @@ void SetParent(Widget* widget, Widget* parent)
 void AddChild(Widget* widget, Widget* child)
 {
     if(!(widget && child)) return;
+    child->parent = widget;
     if(widget->left == NULL) widget->left = child;
     else
     {
@@ -137,7 +139,17 @@ void RenderWidget(Widget* widget, SDL_Renderer* ren)
     if(widget && ren) widget->render(widget, ren);
 }
 
+void DestroySiblings(Widget* widget)
+{
+    if(widget)
+    {
+        DestroySiblings(widget->right);
+        RemoveChild(widget->parent, widget);
+    }
+}
+
 void DestroyWidget(Widget* widget)
 {
+    DestroySiblings(widget->left);
     if(widget) widget->destroy(widget);
 }
