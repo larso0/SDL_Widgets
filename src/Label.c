@@ -24,6 +24,7 @@ Label* CreateLabel(Widget* parent, bool parent_destroy,
     }
     strcpy(label->text, text);
     label->font = font;
+    label->surface = NULL;
     label->texture = NULL;
     label->wrap = wrap;
     return label;
@@ -35,11 +36,30 @@ void UpdateLabel(Widget* widget, SDL_Rect* rect)
     Label* label = (Label*)widget;
     label->rect.x = rect->x;
     label->rect.y = rect->y;
-    if(label->wrap != LABELWRAP_FIXED) label->rect.w = rect->w;
     if(label->texture)
     {
         SDL_DestroyTexture(label->texture);
         label->texture = NULL;
+    }
+    if(label->surface)
+    {
+        SDL_FreeSurface(label->surface);
+        label->surface = NULL;
+    }
+    switch(label->wrap)
+    {
+    case LABELWRAP_FIXED:
+    case LABELWRAP_AUTOMATIC:
+        label->surface = TTF_RenderUTF8_Blended_Wrapped(label->font, label->text, label->fg, rect->w);
+        break;
+    case LABELWRAP_SINGLE_LINE:
+        label->surface = TTF_RenderUTF8_Blended(label->font, label->text, label->fg);
+        break;
+    }
+    if(label->surface)
+    {
+        label->rect.h = label->surface->h;
+        label->rect.w = label->surface->w;
     }
 }
 
@@ -47,24 +67,10 @@ void RenderLabel(Widget* widget, SDL_Renderer* ren)
 {
     if(!(widget && ren)) return;
     Label* label = (Label*)widget;
-    if(!label->texture && label->font)
+    if(!label->texture && label->font && label->surface)
     {
-        SDL_Surface* surf = NULL;
-        switch(label->wrap)
-        {
-        case LABELWRAP_FIXED:
-        case LABELWRAP_AUTOMATIC:
-            surf = TTF_RenderUTF8_Blended_Wrapped(label->font, label->text, label->fg, label->rect.w);
-            break;
-        case LABELWRAP_SINGLE_LINE:
-            surf = TTF_RenderUTF8_Blended(label->font, label->text, label->fg);
-            break;
-        }
-        if(!surf) return;
-        label->texture = SDL_CreateTextureFromSurface(ren, surf);
-        SDL_FreeSurface(surf);
+        label->texture = SDL_CreateTextureFromSurface(ren, label->surface);
         if(!label->texture) return;
-        SDL_QueryTexture(label->texture, NULL, NULL, &label->rect.w, &label->rect.h);
     }
     SDL_SetRenderDrawColor(ren, label->bg.r, label->bg.g, label->bg.b, label->bg.a);
     SDL_RenderFillRect(ren, &label->rect);
@@ -76,6 +82,7 @@ void DestroyLabel(Widget* widget)
     if(!widget) return;
     Label* label = (Label*)widget;
     if(label->text) free(label->text);
+    if(label->surface) SDL_FreeSurface(label->surface);
     if(label->texture) SDL_DestroyTexture(label->texture);
     free(label);
 }

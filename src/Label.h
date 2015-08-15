@@ -24,6 +24,7 @@ typedef struct
 
     char* text;
     TTF_Font* font;
+    SDL_Surface* surface;
     SDL_Texture* texture;
     LabelWrapMode wrap;
 } Label;
