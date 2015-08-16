@@ -28,6 +28,7 @@ void UpdateVLayout(Widget* widget, SDL_Rect* rect)
     for(; tmp; tmp = tmp->right) widget_count++;
     if(widget_count > 0)
     {
+        int height = 0;
         int layout_size = rect->h;
         int widget_size = rect->h / widget_count;
         SDL_Rect widget_rect;
@@ -40,12 +41,18 @@ void UpdateVLayout(Widget* widget, SDL_Rect* rect)
         {
             UpdateWidget(tmp, &widget_rect);
             QueryWidget(tmp, &widget_rect, NULL, NULL);
+            height += widget_rect.h;
             layout_size -= widget_rect.h;
             widget_count--;
             if(widget_rect.h != widget_size && layout_size > 0 && widget_count > 0) widget_size = layout_size / widget_count;
             widget_rect.y += widget_rect.h;
             widget_rect.h = widget_size;
         }
+        widget->rect.h = height;
+    }
+    else
+    {
+        widget->rect.h = 0;
     }
 }
 
