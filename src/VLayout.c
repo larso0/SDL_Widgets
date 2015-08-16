@@ -32,10 +32,10 @@ void UpdateVLayout(Widget* widget, SDL_Rect* rect)
         int layout_size = rect->h;
         int widget_size = rect->h / widget_count;
         SDL_Rect widget_rect;
-        widget_size = rect->h;
         widget_rect.x = rect->x;
         widget_rect.y = rect->y;
         widget_rect.w = rect->w;
+        widget_rect.h = widget_size;
         tmp = widget->left;
         for(; tmp; tmp = tmp->right)
         {
