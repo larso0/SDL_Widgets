@@ -105,25 +105,6 @@ void AddChild(Widget* widget, Widget* child)
     }
 }
 
-void RemoveChild(Widget* widget, Widget* child)
-{
-    if(!(widget && child)) return;
-    Widget* tmp = widget->left;
-    while(tmp && tmp != child) tmp = tmp->right;
-    if(tmp)
-    {
-        if(tmp == widget->left)
-        {
-            widget->left = tmp->right;
-        }
-        else
-        {
-            tmp->left->right = tmp->right;
-        }
-        if(tmp->parent_destroy) tmp->destroy(tmp);
-    }
-}
-
 void UpdateWidget(Widget* widget, SDL_Rect* rect)
 {
     if(widget && widget->update) widget->update(widget, rect);
@@ -139,17 +120,37 @@ void RenderWidget(Widget* widget, SDL_Renderer* ren)
     if(widget && ren) widget->render(widget, ren);
 }
 
-void DestroySiblings(Widget* widget)
+void DestroyWidgetTree(Widget* root)
 {
-    if(widget)
+    if(root)
     {
-        DestroySiblings(widget->right);
-        RemoveChild(widget->parent, widget);
+        DestroyWidgetTree(root->left);
+        DestroyWidgetTree(root->right);
+        if(root->parent_destroy)
+        {
+            root->destroy(root);
+        }
     }
 }
 
 void DestroyWidget(Widget* widget)
 {
-    DestroySiblings(widget->left);
-    if(widget) widget->destroy(widget);
+    if(widget)
+    {
+        DestroyWidgetTree(widget->left);
+        if(widget->parent)
+        {
+            Widget* tmp = widget->parent->left;
+            if(tmp != widget)
+            {
+                for(; tmp->right != widget; tmp = tmp->right);
+                tmp->right = widget->right;
+            }
+            else
+            {
+                widget->parent->left = widget->right;
+            }
+        }
+        widget->destroy(widget);
+    }
 }

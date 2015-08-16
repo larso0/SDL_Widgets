@@ -11,6 +11,8 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
+//TODO FIX THE DAMN MEMORY LEAKS
+
 typedef struct _Widget
 {
     struct _Widget* parent;
@@ -50,7 +52,6 @@ void QueryWidget(Widget* widget, SDL_Rect* rect, SDL_Color* bg, SDL_Color* fg);
 
 void SetParent(Widget* widget, Widget* parent);
 void AddChild(Widget* widget, Widget* child);
-void RemoveChild(Widget* widget, Widget* child);
 
 void UpdateWidget(Widget* widget, SDL_Rect* rect);
 void HandleEvent(Widget* widget, SDL_Event* e);
