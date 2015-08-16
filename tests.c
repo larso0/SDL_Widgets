@@ -9,6 +9,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include "src/VLayout.h"
+#include "src/HLayout.h"
 #include "src/Widget.h"
 #include "src/Label.h"
 
@@ -55,9 +56,19 @@ int main(int argc, char** argv)
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
+    SDL_Color red;
+    red.r = red.a = 255;
+    red.g = red.b = 0;
+    SDL_Color green;
+    green.r = green.b = 0;
+    green.g = green.a = 255;
+
     VLayout* layout = CreateVLayout(NULL, false, NULL, NULL);
     CreateLabel((Widget*)layout, true, "This is my awesome label that I am very proud of introducing to you :)", font, LABELWRAP_AUTOMATIC, NULL, NULL);
     CreateLabel((Widget*)layout, true, "This is another label beneath the first one. :O", font, LABELWRAP_AUTOMATIC, NULL, NULL);
+    HLayout* hlayout = CreateHLayout((Widget*)layout, true, NULL, NULL);
+    CreateLabel((Widget*)hlayout, true, "This is a label inside a HLayout. Such fun.", font, LABELWRAP_AUTOMATIC, &red, NULL);
+    CreateLabel((Widget*)hlayout, true, "This is another cool label inside the same HLayout. Howdy dawg stuff awesomeness.", font, LABELWRAP_AUTOMATIC, &green, NULL);
 
     Widget* wptr = (Widget*)layout;
 
