@@ -47,6 +47,7 @@ void UpdateVLayout(Widget* widget, SDL_Rect* rect)
             if(widget_rect.h != widget_size && layout_size > 0 && widget_count > 0) widget_size = layout_size / widget_count;
             widget_rect.y += widget_rect.h;
             widget_rect.h = widget_size;
+            widget_rect.w = rect->w;
         }
         widget->rect.h = height;
     }

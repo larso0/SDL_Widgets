@@ -43,7 +43,7 @@ int main(int argc, char** argv)
         SDL_Quit();
         return 4;
     }
-    TTF_Font* font = TTF_OpenFont("freefont/FreeMono.ttf", 14);
+    TTF_Font* font = TTF_OpenFont("freefont/FreeSans.ttf", 18);
     if(!font)
     {
         fprintf(stderr, "%s\n", TTF_GetError());
